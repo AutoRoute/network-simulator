@@ -1,7 +1,11 @@
 {
-	"network": [
-		{"id": "A", "neighbors": ["B", "C"]},
-		{"id": "B", "neighbors": ["A", "C"]},
-		{"id": "C", "neighbors": ["A", "B"]}
-	]
+	"graph": {
+		"nodes": [
+			{"id": "A"},
+			{"id": "B"}
+		],
+		"edges": [
+			{"first": "A", "second": "B"}
+		]
+	}
 }

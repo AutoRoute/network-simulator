@@ -1,4 +1,4 @@
-package main
+package netsim
 
 import (
 	"testing"
@@ -10,22 +10,24 @@ func TestLoadConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if config.Network[0].ID != "A" ||
-		config.Network[0].Neighbors[0] != "B" ||
-		config.Network[0].Neighbors[1] != "C" ||
-		config.Network[1].ID != "B" ||
-		config.Network[1].Neighbors[0] != "A" ||
-		config.Network[1].Neighbors[1] != "C" ||
-		config.Network[2].ID != "C" ||
-		config.Network[2].Neighbors[0] != "A" ||
-		config.Network[2].Neighbors[1] != "B" {
-		t.Fatal("Configs are not the same")
+	if config.Graph.Nodes[0].ID != "A" ||
+		config.Graph.Nodes[1].ID != "B" ||
+		config.Graph.Edges[0].First != "A" ||
+		config.Graph.Edges[0].Second != "B" {
+		t.Fatal("Config not parsed correctly")
 	}
 }
 
-func TestInvalidConfig(t *testing.T) {
-	_, err := LoadConfig("examples/bad_config.json")
+func TestBadFile(t *testing.T) {
+	_, err := LoadConfig("fake/path")
 	if err == nil {
-		t.Fatal("Invalid config was validated")
+		t.Fatal("Didn't fail on non-existent file")
+	}
+}
+
+func TestBadJSON(t *testing.T) {
+	_, err := LoadConfig("examples/bad.json")
+	if err == nil {
+		t.Fatal("Didn't fail on bad JSON")
 	}
 }

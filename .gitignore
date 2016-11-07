@@ -22,3 +22,10 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+# Cover profiles
+cover.html
+cover.out
+
+# Vim
+*.swp

@@ -1,8 +1,0 @@
-{
-	"network": [
-		{"id": "A", "neighbors": ["B", "C"]},
-		{"id": "B", "neighbors": ["A", "D"]},
-		{"id": "C", "neighbors": ["A", "D"]},
-		{"id": "D", "neighbors": ["B", "C"]}
-	]
-}
