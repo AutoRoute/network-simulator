@@ -1,0 +1,6 @@
+{
+	"packets": [
+		{"source": "A", "destination": "B", "t": 0},
+		{"source": "A", "destination": "C", "t": 1}
+	]
+}

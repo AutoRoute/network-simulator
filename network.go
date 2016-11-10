@@ -5,10 +5,14 @@ import (
 	"fmt"
 )
 
+// A Network represents an AutoRoute network of connected nodes.
 type Network struct {
 	Nodes map[NodeAddress]*Node
 }
 
+// NewNetwork takes a *Config object and returns a *Network and error.
+// Based off the config, it creates Node objects from the graph's
+// NodeConfig and adds neighbors to the Nodes from the graph's EdgeConfig
 func NewNetwork(config *Config) (*Network, error) {
 	network := &Network{make(map[NodeAddress]*Node)}
 	for _, n := range config.Graph.Nodes {
