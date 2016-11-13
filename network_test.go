@@ -10,26 +10,26 @@ func TestNewNetwork(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	network, err := NewNetwork(config)
+	network, err := NewNetwork(config, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	nodeA, ok := network.Nodes["A"]
-	if !ok {
-		t.Fatal("Node A not in network")
+	nodeA, err := network.getNode("A")
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	nodeB, ok := network.Nodes["B"]
-	if !ok {
-		t.Fatal("Node B not in network")
+	nodeB, err := network.getNode("B")
+	if err != nil {
+		t.Fatal(nil)
 	}
 
-	if _, ok = nodeA.Neighbors["B"]; !ok {
+	if _, ok := nodeA.Neighbors["B"]; !ok {
 		t.Fatal("Node A doesn't have neighbor B")
 	}
 
-	if _, ok = nodeB.Neighbors["A"]; !ok {
+	if _, ok := nodeB.Neighbors["A"]; !ok {
 		t.Fatal("Node B doesn't have neighbor A")
 	}
 }
@@ -45,7 +45,7 @@ func TestDuplicateNodes(t *testing.T) {
 		},
 	}
 
-	_, err := NewNetwork(config)
+	_, err := NewNetwork(config, nil)
 	if err == nil {
 		t.Fatal("Didn't fail on duplicate nodes")
 	}
@@ -61,7 +61,7 @@ func TestAddEdgeNotInNetwork(t *testing.T) {
 		},
 	}
 
-	_, err := NewNetwork(config)
+	_, err := NewNetwork(config, nil)
 	if err == nil {
 		t.Fatal("Didn't fail on edge with nodes not in network")
 	}
@@ -77,7 +77,7 @@ func TestAddEdgeNotInNetwork(t *testing.T) {
 		},
 	}
 
-	_, err = NewNetwork(config)
+	_, err = NewNetwork(config, nil)
 	if err == nil {
 		t.Fatal("Didn't fail on edge with node not in network")
 	}
@@ -97,7 +97,7 @@ func TestDuplicateEdge(t *testing.T) {
 		},
 	}
 
-	_, err := NewNetwork(config)
+	_, err := NewNetwork(config, nil)
 	if err == nil {
 		t.Fatal("Didn't fail on duplicate edge")
 	}

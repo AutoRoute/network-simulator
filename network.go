@@ -7,16 +7,16 @@ import (
 
 // A Network represents an AutoRoute network of connected nodes.
 type Network struct {
-	Nodes map[NodeAddress]*Node
+	nodes map[NodeAddress]*Node
 }
 
 // NewNetwork takes a *Config object and returns a *Network and error.
 // Based off the config, it creates Node objects from the graph's
-// NodeConfig and adds neighbors to the Nodes from the graph's EdgeConfig
-func NewNetwork(config *Config) (*Network, error) {
+// NodeConfig and adds neighbors to the nodes from the graph's EdgeConfig
+func NewNetwork(config *Config, delivered chan *Packet) (*Network, error) {
 	network := &Network{make(map[NodeAddress]*Node)}
 	for _, n := range config.Graph.Nodes {
-		if err := network.addNode(n); err != nil {
+		if err := network.addNode(n, delivered); err != nil {
 			return nil, err
 		}
 	}
@@ -29,9 +29,9 @@ func NewNetwork(config *Config) (*Network, error) {
 	return network, nil
 }
 
-func (n Network) addNode(node *NodeConfig) error {
-	if _, ok := n.Nodes[node.ID]; !ok {
-		n.Nodes[node.ID] = NewNode(node.ID)
+func (n Network) addNode(node *NodeConfig, delivered chan *Packet) error {
+	if _, ok := n.nodes[node.ID]; !ok {
+		n.nodes[node.ID] = NewNode(node.ID, delivered)
 		return nil
 	} else {
 		msg := fmt.Sprintf("Node %s already in network", node.ID)
@@ -40,13 +40,13 @@ func (n Network) addNode(node *NodeConfig) error {
 }
 
 func (n Network) addEdge(edge *EdgeConfig) error {
-	node1, ok := n.Nodes[edge.First]
+	node1, ok := n.nodes[edge.First]
 	if !ok {
 		msg := fmt.Sprintf("Cannot add edge %s-%s: Node %s not in network",
 			edge.First, edge.Second, edge.First)
 		return errors.New(msg)
 	}
-	node2, ok := n.Nodes[edge.Second]
+	node2, ok := n.nodes[edge.Second]
 	if !ok {
 		msg := fmt.Sprintf("Cannot add edge %s-%s: Node %s not in network",
 			edge.First, edge.Second, edge.Second)
@@ -62,4 +62,14 @@ func (n Network) addEdge(edge *EdgeConfig) error {
 		return err
 	}
 	return nil
+}
+
+func (n Network) getNode(id NodeAddress) (*Node, error) {
+	node, ok := n.nodes[id]
+	if !ok {
+		msg := fmt.Sprintf("Cannot find node %s in network", id)
+		return nil, errors.New(msg)
+	}
+
+	return node, nil
 }

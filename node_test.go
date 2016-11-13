@@ -5,8 +5,8 @@ import (
 )
 
 func TestAddNeighbor(t *testing.T) {
-	node1 := NewNode("A")
-	node2 := NewNode("B")
+	node1 := NewNode("A", nil)
+	node2 := NewNode("B", nil)
 
 	if err := node1.AddNeighbor(node1); err == nil {
 		t.Fatalf("Node %s added itself as neighbor", node1.ID)
