@@ -37,7 +37,7 @@ func NewSimulation(config string, packets string) (*Simulation, error) {
 func (s Simulation) Run() error {
 	t := 0
 	for {
-		if 0 == len(s.packets) {
+		if t > s.packets[len(s.packets)-1].T {
 			break
 		}
 
