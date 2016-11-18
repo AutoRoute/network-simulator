@@ -5,41 +5,45 @@ import (
 	"fmt"
 )
 
-// Node identifier
+// NodeAddress is an AutoRoute node identifier
 type NodeAddress string
 
 // A Node is an AutoRoute packet router in the network.
 // It is a aware of its neighbors and can send a packet
 // to any Node it is directly connected to.
 type Node struct {
-	ID        NodeAddress
-	Neighbors map[NodeAddress]*Node
-	delivered chan *Packet
+	ID          NodeAddress
+	connections map[NodeAddress]*Connection
+	Packets     chan *Packet
+	delivered   chan *Packet
 }
 
 // NewNode takes a NodeAddress and returns a *Node. The
 // new Node is not connected to any other Node.
 func NewNode(id NodeAddress, delivered chan *Packet) *Node {
-	return &Node{id, make(map[NodeAddress]*Node), delivered}
+	return &Node{id, make(map[NodeAddress]*Connection), make(chan *Packet), delivered}
 }
 
-// AddNeighbor takes a Node (other) and adds it to this Node's
-// neighbor map.
-// Note: other Node will not have this Node in its neighbor map.
-func (n Node) AddNeighbor(node *Node) error {
-	if n.ID == node.ID {
-		msg := fmt.Sprintf("Node %s cannot add itself as neighbor", n.ID)
+// AddConnection takes a *Connection and adds it to this Node's
+// connection map.
+func (n Node) AddConnection(conn *Connection) error {
+	neighbor := conn.GetNeighbor(n.ID)
+	if n.ID == neighbor {
+		msg := fmt.Sprintf("Node %s cannot add connection with itself", n.ID)
 		return errors.New(msg)
 	}
-	if _, ok := n.Neighbors[node.ID]; !ok {
-		n.Neighbors[node.ID] = node
+	if _, ok := n.connections[neighbor]; !ok {
+		n.connections[neighbor] = conn
 		return nil
-	} else {
-		msg := fmt.Sprintf("Node %s already has neighbor %s", n.ID, node.ID)
-		return errors.New(msg)
 	}
+
+	msg := fmt.Sprintf("Node %s already has connection with neighbor %s", n.ID, neighbor)
+	return errors.New(msg)
 }
 
+// SendPacket takes a *Packet and sends it
+// to a neighbor determined by the Node's
+// routing algorithm
 func (n Node) SendPacket(p *Packet) error {
 	if p.Source == n.ID {
 		n.delivered <- p

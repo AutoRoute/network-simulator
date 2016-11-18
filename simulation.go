@@ -1,18 +1,23 @@
 package netsim
 
+// Simulation keeps the state of the network
+// and the packets sent/to be sent
 type Simulation struct {
 	network *Network
 	packets []*Packet
 
 	// Maximum number of
 	// iterations
-	max_itr int
+	maxItr int
 
 	// Incoming channel of
 	// delivered packets
 	delivered <-chan *Packet
 }
 
+// NewSimulation takes a string path to a network configuration JSON
+// file and a simulated packets JSON file and returns a *Simulation
+// and error
 func NewSimulation(config string, packets string) (*Simulation, error) {
 	c, err := LoadConfig(config)
 	if err != nil {
@@ -34,6 +39,8 @@ func NewSimulation(config string, packets string) (*Simulation, error) {
 	return &Simulation{n, p.Packets, 0, d}, nil
 }
 
+// Run starts the simulation and blocks until all
+// iterations are done or if there was an error.
 func (s Simulation) Run() error {
 	t := 0
 	for {
@@ -46,7 +53,7 @@ func (s Simulation) Run() error {
 				break
 			}
 
-			err := s.sendPacket(p)
+			err := s.addPacket(p)
 			if err != nil {
 				return err
 			}
@@ -57,11 +64,12 @@ func (s Simulation) Run() error {
 	return nil
 }
 
-func (s Simulation) sendPacket(p *Packet) error {
+func (s Simulation) addPacket(p *Packet) error {
 	n, err := s.network.getNode(p.Source)
 	if err != nil {
 		return err
 	}
 
-	return n.SendPacket(p)
+	n.Packets <- p
+	return nil
 }

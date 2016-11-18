@@ -33,10 +33,10 @@ func (n Network) addNode(node *NodeConfig, delivered chan *Packet) error {
 	if _, ok := n.nodes[node.ID]; !ok {
 		n.nodes[node.ID] = NewNode(node.ID, delivered)
 		return nil
-	} else {
-		msg := fmt.Sprintf("Node %s already in network", node.ID)
-		return errors.New(msg)
 	}
+
+	msg := fmt.Sprintf("Node %s already in network", node.ID)
+	return errors.New(msg)
 }
 
 func (n Network) addEdge(edge *EdgeConfig) error {
@@ -53,10 +53,11 @@ func (n Network) addEdge(edge *EdgeConfig) error {
 		return errors.New(msg)
 	}
 
-	if err := node1.AddNeighbor(node2); err != nil {
+	conn := NewConnection(node1.ID, node2.ID, node1.Packets, node2.Packets)
+	if err := node1.AddConnection(conn); err != nil {
 		return err
 	}
-	if err := node2.AddNeighbor(node1); err != nil {
+	if err := node2.AddConnection(conn); err != nil {
 		// This should never be reached since neighborship should
 		// be recorded on both nodes
 		return err

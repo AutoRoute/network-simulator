@@ -29,3 +29,6 @@ cover.out
 
 # Vim
 *.swp
+
+# VSCode
+*.vscode
